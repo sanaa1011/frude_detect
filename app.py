@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from flask import Flask, request, jsonify, send_from_directory, render_template_string
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from catboost import CatBoostClassifier
 
@@ -10,65 +10,35 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# الفيتشرز الجديدة (نفس التي دربت عليها المودل)
-expected_features = {
-    "user_id": "user_id",
-    "transaction_date": "transaction_date", 
-    "type": "type",
-    "amount": "amount",
-    "old_balance": "old_balance",
-    "new_balance": "new_balance",
-    "destination_account": "destination_account",
-    "source_account": "source_account",
-    "branch": "branch",
-    "currency": "currency",
-    "device": "device", 
-    "ip": "ip",
-    "location": "location"
-}
+required_columns = [
+    'transaction_date', 'type', 'amount',
+    'old_balance', 'new_balance', 'branch',
+    'currency', 'device', 'location'
+]
 
-# الأعمدة التصنيفية
-cat_features = ["user_id", "type", "destination_account", "source_account", 
-                "branch", "currency", "device", "ip", "location"]
-
-def prepare_data(df, expected_features):
-    """
-    تحضير البيانات لتتناسب مع المودل المدرب
-    """
+def prepare_data(df):
     print("Original columns:", df.columns.tolist())
-    
-    # إعادة تسمية الأعمدة إذا كانت مختلفة
-    df = df.rename(columns=expected_features)
-    print("After renaming columns:", df.columns.tolist())
-    
-    # استخراج الميزات من التاريخ
-    if "transaction_date" in df.columns:
-        df["hour"] = pd.to_datetime(df["transaction_date"]).dt.hour
-        df["day_of_week"] = pd.to_datetime(df["transaction_date"]).dt.dayofweek
-        df = df.drop(columns=["transaction_date"])
-    else:
-        # إذا لم يكن هناك تاريخ، استخدم قيم افتراضية
-        df["hour"] = 12
-        df["day_of_week"] = 1
-    
-    # ترتيب الأعمدة كما في التدريب
+
+    missing = [c for c in required_columns if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing columns: {', '.join(missing)}")
+
+    df["hour"] = pd.to_datetime(df["transaction_date"]).dt.hour
+    df["dayofweek"] = pd.to_datetime(df["transaction_date"]).dt.dayofweek
+    df = df.drop(columns=["transaction_date"], errors="ignore")
+
+    df["balance_diff"] = df["old_balance"] - df["new_balance"]
+    df["amount_ratio"] = df["amount"] / (df["old_balance"] + 1e-6)
+
     final_columns = [
-        "user_id", "type", "amount", "old_balance", "new_balance",
-        "destination_account", "source_account", "branch", "currency", 
-        "device", "ip", "location", "hour", "day_of_week"
+        'type', 'amount', 'old_balance', 'new_balance',
+        'branch', 'currency', 'device', 'location',
+        'hour', 'dayofweek', 'balance_diff', 'amount_ratio'
     ]
-    
-    # التأكد من وجود جميع الأعمدة
-    for col in final_columns:
-        if col not in df.columns:
-            # إضافة الأعمدة المفقودة بقيم افتراضية
-            if col in ["amount", "old_balance", "new_balance", "hour", "day_of_week"]:
-                df[col] = 0.0
-            else:
-                df[col] = "unknown"
-    
-    print("Final columns for model:", df[final_columns].columns.tolist())
+
+    print("✅ Final columns for model:", final_columns)
     return df[final_columns]
+
 
 @app.route("/predict", methods=["POST"])
 def predict_route():
@@ -79,7 +49,6 @@ def predict_route():
     if data_file.filename == '':
         return jsonify({"error": "No file selected"}), 400
 
-    # التحقق من نوع الملف
     if not (data_file.filename.endswith('.csv') or data_file.filename.endswith('.xlsx')):
         return jsonify({"error": "Only CSV and Excel files are supported"}), 400
 
@@ -87,51 +56,41 @@ def predict_route():
     data_file.save(data_path)
 
     try:
-        # قراءة الملف
-        print(f"Processing file: {data_path}")
-        
+        print(f"📂 Processing file: {data_path}")
         if data_path.endswith(".csv"):
             df = pd.read_csv(data_path)
         else:
             df = pd.read_excel(data_path)
 
-        print(f"File loaded successfully with {len(df)} rows")
-        print(f"Columns in file: {df.columns.tolist()}")
-        
-        # الفيتشرز المطلوبة (نفس التي دربت عليها المودل)
-        required_columns = [
-            'user_id', 'transaction_date', 'type', 'amount', 
-            'old_balance', 'new_balance', 'destination_account', 
-            'source_account', 'branch', 'currency', 'device', 'ip', 'location'
-        ]
-        
-        # التحقق من الأعمدة المفقودة
-        missing_cols = [col for col in required_columns if col not in df.columns]
-        if missing_cols:
-            available_cols = df.columns.tolist()
-            error_msg = f"Missing columns: {', '.join(missing_cols)}. Available columns: {', '.join(available_cols)}"
-            print(f"Error: {error_msg}")
-            return jsonify({"error": error_msg}), 400
+        print(f"✅ File loaded successfully with {len(df)} rows")
 
-        print("All required columns are present")
+        df_prepared = prepare_data(df.copy())
 
-        # تحضير البيانات للمودل
-        print("Preparing data for model...")
-        df_prepared = prepare_data(df.copy(), expected_features)
-        print("Data preparation completed")
-        
-        # محاكاة المودل (يمكنك استبدال هذا بالمودل الحقيقي)
-        print("Making predictions...")
-        np.random.seed(42)
-        preds = np.random.randint(0, 2, len(df))
-        probas = np.random.random(len(df))
+        model = CatBoostClassifier()
+        model.load_model("catboost_model.cbm")
+        print("🤖 Model loaded successfully.")
 
-        # إضافة النتائج للبيانات الأصلية
+        # ✅ توحيد الأعمدة حسب ما تدرب عليه المودل
+        model_features = model.feature_names_
+        print("🧩 Model was trained on features:", model_features)
+
+        # أضف الأعمدة الناقصة بقيم صفر أو None
+        for col in model_features:
+            if col not in df_prepared.columns:
+                df_prepared[col] = 0
+
+        # تأكد من ترتيب الأعمدة بنفس ترتيب التدريب
+        df_prepared = df_prepared[model_features]
+        print("✅ Final aligned columns:", df_prepared.columns.tolist())
+
+        preds = model.predict(df_prepared)
+        probas = model.predict_proba(df_prepared)[:, 1]
+
         df["predicted_fraud"] = preds
         df["fraud_probability"] = np.round(probas * 100, 2)
 
         result_data = df.head(50).replace({np.nan: None}).to_dict(orient="records")
-        
+
         response = {
             "success": True,
             "total_count": len(df),
@@ -139,47 +98,34 @@ def predict_route():
             "fraud_rate": round((df["predicted_fraud"] == 1).mean() * 100, 2),
             "data": result_data
         }
-        
-        print(f"Prediction complete: {response['fraud_count']} fraud cases out of {response['total_count']} transactions")
+
+        print(f"✅ Prediction complete: {response['fraud_count']} fraud cases out of {response['total_count']}")
         return jsonify(response)
-        
+
     except Exception as e:
-        print(f"Error in prediction: {str(e)}")
         import traceback
         traceback.print_exc()
-        return jsonify({"error": f"Processing error: {str(e)}"}), 500
+        print("🔥 Error details:", str(e))
+        return jsonify({"error": str(e)}), 500
+
     finally:
         if os.path.exists(data_path):
             os.remove(data_path)
 
-# Routes for serving different pages
+
 @app.route("/")
 def serve_home():
-    print("Serving home page...")
-    try:
-        return send_from_directory('.', 'home.html')
-    except Exception as e:
-        print(f"Error serving home page: {e}")
-        return "Home page not found", 404
+    return send_from_directory('.', 'home.html')
 
 @app.route("/dashboard")
 def serve_dashboard():
-    print("Serving dashboard page...")
-    try:
-        return send_from_directory('.', 'index.html')
-    except Exception as e:
-        print(f"Error serving dashboard: {e}")
-        return "Dashboard not found", 404
+    return send_from_directory('.', 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    print(f"Serving static file: {path}")
     return send_from_directory('.', path)
 
+
 if __name__ == "__main__":
-    print("Starting FraudGuard Server...")
-    print("Home Page: http://localhost:5000/")
-    print("Dashboard: http://localhost:5000/dashboard")
-    print("Current directory:", os.getcwd())
-    print("Files in directory:", [f for f in os.listdir('.') if f.endswith('.html')])
+    print("🚀 Starting Fraud Detection Server...")
     app.run(debug=True, host='0.0.0.0', port=5000)
