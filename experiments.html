@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Experiments - FraudGuard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: #ff9f43;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-links a.active {
+            background: rgba(255, 159, 67, 0.2);
+            color: #ff9f43;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .experiments-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .experiment-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .experiment-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .experiment-filename {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .experiment-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .experiment-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .fraud-stat { color: #e74c3c; }
+        .total-stat { color: #3498db; }
+        .rate-stat { color: #f39c12; }
+        
+        .experiment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .no-experiments {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .no-experiments i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>FraudGuard</span>
+                </div>
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/my-experiments" class="active">My Experiments</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <h1>My Saved Experiments</h1>
+            
+            <div id="experimentsList" class="experiments-grid">
+                <div class="no-experiments">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>No experiments yet</h3>
+                    <p>Your saved fraud detection experiments will appear here.</p>
+                    <a href="/dashboard" class="btn btn-primary" style="margin-top: 15px;">
+                        Start New Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // جلب تجارب المستخدم
+        async function loadExperiments() {
+            try {
+                const response = await fetch('/api/experiments');
+                const data = await response.json();
+                
+                const experimentsList = document.getElementById('experimentsList');
+                
+                if (data.experiments && data.experiments.length > 0) {
+                    experimentsList.innerHTML = '';
+                    
+                    data.experiments.forEach(exp => {
+                        const experimentCard = document.createElement('div');
+                        experimentCard.className = 'experiment-card';
+                        
+                        experimentCard.innerHTML = `
+                            <div class="experiment-header">
+                                <div class="experiment-filename">${exp.filename}</div>
+                                <div class="experiment-date">${new Date(exp.created_at).toLocaleDateString()}</div>
+                            </div>
+                            
+                            <div class="experiment-stats">
+                                <div class="stat">
+                                    <div class="stat-value total-stat">${exp.total_count}</div>
+                                    <div class="stat-label">Total Transactions</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value fraud-stat">${exp.fraud_count}</div>
+                                    <div class="stat-label">Fraud Cases</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value rate-stat">${exp.fraud_rate}%</div>
+                                    <div class="stat-label">Fraud Rate</div>
+                                </div>
+                            </div>
+                            
+                            <div class="experiment-actions">
+                                <button class="btn btn-primary" onclick="viewExperiment('${exp.id}')">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-success" onclick="downloadExperiment('${exp.id}')">
+                                    <i class="fas fa-download"></i> Download Results
+                                </button>
+                            </div>
+                        `;
+                        
+                        experimentsList.appendChild(experimentCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading experiments:', error);
+            }
+        }
+        
+        function viewExperiment(experimentId) {
+            alert('Viewing experiment: ' + experimentId);
+            // يمكنك إضافة وظيفة عرض التفاصيل هنا
+        }
+        
+        function downloadExperiment(experimentId) {
+            alert('Downloading experiment: ' + experimentId);
+            // يمكنك إضافة وظيفة التحميل هنا
+        }
+        
+        // تحميل التجارب عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', loadExperiments);
+    </script>
+</body>
+</html>

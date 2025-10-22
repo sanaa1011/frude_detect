@@ -440,7 +440,7 @@
 </head>
 <body>
     <div class="container">
-        <header>
+         <header>
             <div class="nav-container">
                 <div class="logo">
                     <i class="fas fa-shield-alt"></i>
@@ -449,8 +449,10 @@
                 <div class="nav-links">
                     <a href="/">Home</a>
                     <a href="/dashboard" class="active">Dashboard</a>
-                    <a href="#">Analytics</a>
-                    <a href="#">Documentation</a>
+                    <a href="/login" id="loginLink">LogIn</a>
+                    <a href="/register" id="registerLink">SignUp</a>
+                    <a href="/my-experiments" id="experimentsLink" style="display: none;">My Experiments</a>
+                    <a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a>
                 </div>
             </div>
         </header>
@@ -499,6 +501,22 @@
                         <button class="btn btn-success" onclick="processFile()">
                             <i class="fas fa-play"></i> Process File
                         </button>
+                    </div>
+                    <!-- استبدل قسم upload options في index.html بهذا الكود -->
+                     <div class="upload-options" style="margin: 20px 0; text-align: center;">
+                        <label style="display: block; margin-bottom: 10px; color: #2c3e50; font-weight: bold;">
+                            Save Results:
+                        </label>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="saveOption" value="guest" checked> 
+                                Try Once (Results won't be saved)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; color: #7f8c8d;" id="saveOptionLabel">
+                                <input type="radio" name="saveOption" value="save" disabled> 
+                                <span id="saveOptionText">Sign up to save results</span>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="loader" id="loader"></div>
@@ -635,6 +653,86 @@
         let amountChart = null;
         let probabilityChart = null;
 
+        function getSaveOption() {
+    const selectedOption = document.querySelector('input[name="saveOption"]:checked');
+    return selectedOption ? selectedOption.value : 'guest';
+}
+        // دالة لتحديث خيارات الحفظ بناءً على حالة المستخدم
+async function updateSaveOptions() {
+    try {
+        const response = await fetch('/api/auth-status');
+        const data = await response.json();
+        
+        const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
+        const saveOptionLabel = document.getElementById('saveOptionLabel');
+        const saveOptionText = document.getElementById('saveOptionText');
+        
+        if (data.logged_in) {
+            // المستخدم مسجل - تفعيل خيار الحفظ
+            saveOptionInput.disabled = false;
+            saveOptionLabel.style.color = '#2c3e50';
+            saveOptionText.innerHTML = 'Save to My Account';
+            saveOptionText.style.color = '#2c3e50';
+        } else {
+            // المستخدم غير مسجل - تعطيل خيار الحفظ وعرض رابط التسجيل
+            saveOptionInput.disabled = true;
+            saveOptionLabel.style.color = '#7f8c8d';
+            saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
+        }
+    } catch (error) {
+        console.log('Error checking auth status:', error);
+        // في حالة الخطأ، نعرض الحالة الافتراضية (غير مسجل)
+        const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
+        const saveOptionLabel = document.getElementById('saveOptionLabel');
+        const saveOptionText = document.getElementById('saveOptionText');
+        
+        saveOptionInput.disabled = true;
+        saveOptionLabel.style.color = '#7f8c8d';
+        saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
+    }
+}
+
+// تحديث خيارات الحفظ عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    updateSaveOptions();
+    checkAuthStatus(); // استدعاء الدالة التي أضفناها سابقاً للـ navigation
+});
+        // التحقق من حالة المستخدم
+async function checkAuthStatus() {
+    try {
+        const response = await fetch('/api/auth-status');
+        const data = await response.json();
+        
+        if (data.logged_in) {
+            document.getElementById('loginLink').style.display = 'none';
+            document.getElementById('registerLink').style.display = 'none';
+            document.getElementById('experimentsLink').style.display = 'block';
+            document.getElementById('logoutLink').style.display = 'block';
+        }
+    } catch (error) {
+        console.log('User not logged in');
+    }
+}
+
+// دالة تسجيل الخروج
+async function logout() {
+    try {
+        const response = await fetch('/logout');
+        if (response.ok) {
+            window.location.href = '/';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+}
+
+// تشغيل التحقق عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', checkAuthStatus);
+
+        function getSaveOption() {
+            const selectedOption = document.querySelector('input[name="saveOption"]:checked');
+            return selectedOption ? selectedOption.value : 'guest';
+        }
         // Page navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
@@ -716,56 +814,57 @@
         
         // Process the uploaded file
         function processFile() {
-            const fileInput = document.getElementById('fileInput');
-            if (!fileInput.files.length) {
-                showError('Please select a file first');
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            // Show loading state
-            const processBtn = document.querySelector('.btn-success');
-            const originalText = processBtn.innerHTML;
-            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            processBtn.disabled = true;
-            document.getElementById('loader').style.display = 'block';
-            hideAlerts();
-            
-            // Send to backend
-            fetch('/predict', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                currentData = data;
-                displayResults(data);
-                showSuccess('File processed successfully!');
-                showPage('results');
-            })
-            .catch(error => {
-                showError('Error: ' + error.message);
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                // Reset button
-                processBtn.innerHTML = '<i class="fas fa-play"></i> Process File';
-                processBtn.disabled = false;
-                document.getElementById('loader').style.display = 'none';
-            });
+    const fileInput = document.getElementById('fileInput');
+    if (!fileInput.files.length) {
+        showError('Please select a file first');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('saveOption', getSaveOption());
+    
+    // Show loading state
+    const processBtn = document.querySelector('.btn-success');
+    const originalText = processBtn.innerHTML;
+    processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    processBtn.disabled = true;
+    document.getElementById('loader').style.display = 'block';
+    hideAlerts();
+    
+    // Send to backend
+    fetch('/predict', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        currentData = data;
+        displayResults(data);
+        showSuccess('File processed successfully!');
+        showPage('results');
+    })
+    .catch(error => {
+        showError('Error: ' + error.message);
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        // Reset button
+        processBtn.innerHTML = '<i class="fas fa-play"></i> Process File';
+        processBtn.disabled = false;
+        document.getElementById('loader').style.display = 'none';
+    });
+}
         
         // Display results from backend
         function displayResults(data) {

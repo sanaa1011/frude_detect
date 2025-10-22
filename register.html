@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب - FraudGuard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert-success {
+            background: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+        
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <h1>🛡️ FraudGuard</h1>
+            <p>إنشاء حساب جديد</p>
+        </div>
+        
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+        
+        <form id="registerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">الاسم الأول:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_name">الاسم الأخير:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <div class="password-requirements">يجب أن تكون كلمة المرور 6 أحرف على الأقل</div>
+            </div>
+            
+            <button type="submit" class="btn">إنشاء الحساب</button>
+        </form>
+        
+        <div class="links">
+            <a href="/login">لديك حساب؟ سجل الدخول</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = 'جاري إنشاء الحساب...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', data.message);
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showAlert('error', data.error);
+                }
+            } catch (error) {
+                showAlert('error', 'خطأ في الاتصال بالخادم');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function showAlert(type, message) {
+            const alert = document.getElementById(type + 'Alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
