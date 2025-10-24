@@ -6,7 +6,6 @@
     <title>FraudGuard - AI Anomaly Detection</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* نفس الستايل السابق */
         * {
             margin: 0;
             padding: 0;
@@ -14,10 +13,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html, body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
             color: #333;
+        }
+
+        main {
+            flex: 1;
         }
 
         .container {
@@ -26,7 +34,7 @@
             padding: 20px;
         }
 
-        /* Header Styles */
+        /* Header */
         header {
             background: rgba(255, 255, 255, 0.95);
             padding: 20px 0;
@@ -79,7 +87,7 @@
             color: #ff9f43;
         }
 
-        /* باقي الستايل كما هو */
+        /* Hero */
         .hero {
             margin: 40px 0;
             padding: 60px 40px;
@@ -126,11 +134,13 @@
             background: #27ae60;
         }
 
+        /* Footer */
         footer {
             background: rgba(255, 255, 255, 0.95);
             color: white;
             padding: 50px 0 20px;
-            margin-top: 60px;
+            width: 100%;
+            margin-top: auto;
         }
 
         .footer-bottom {
@@ -148,7 +158,6 @@
                 <span>FraudGuard</span>
             </div>
             <div class="nav-links" id="navLinks">
-                <!-- سيتم تعبئة هذا القسم بالجافاسكريبت -->
                 <a href="#" class="active">Home</a>
                 <a href="/dashboard">Dashboard</a>
                 <a href="/login" id="loginLink">LogIn</a>
@@ -159,18 +168,18 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Hero Section -->
-        <section class="hero">
-            <h1>Detect anomalies in your data in minutes</h1>
-            <h2>Advanced Fraud Detection System Powered by Machine Learning</h2>
-            
-            <a href="/dashboard" class="btn btn-success">
-                <i class="fas fa-rocket"></i> try it now
-            </a>
-        </section>
-    </div>
+    <!-- Main -->
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1>Detect anomalies in your data in minutes</h1>
+                <h2>Advanced Fraud Detection System Powered by Machine Learning</h2>
+                <a href="/dashboard" class="btn btn-success">
+                    <i class="fas fa-rocket"></i> try it now
+                </a>
+            </section>
+        </div>
+    </main>
 
     <!-- Footer -->
     <footer>
@@ -180,20 +189,17 @@
     </footer>
 
     <script>
-        // التحقق من حالة المستخدم وعرض القائمة المناسبة
         async function checkAuthStatus() {
             try {
                 const response = await fetch('/api/auth-status');
                 const data = await response.json();
                 
                 if (data.logged_in) {
-                    // المستخدم مسجل دخول
                     document.getElementById('loginLink').style.display = 'none';
                     document.getElementById('registerLink').style.display = 'none';
                     document.getElementById('experimentsLink').style.display = 'block';
                     document.getElementById('logoutLink').style.display = 'block';
                 } else {
-                    // المستخدم غير مسجل
                     document.getElementById('loginLink').style.display = 'block';
                     document.getElementById('registerLink').style.display = 'block';
                     document.getElementById('experimentsLink').style.display = 'none';
@@ -201,7 +207,6 @@
                 }
             } catch (error) {
                 console.log('User not logged in');
-                // في حالة الخطأ، نعرض الروابط الافتراضية
                 document.getElementById('loginLink').style.display = 'block';
                 document.getElementById('registerLink').style.display = 'block';
                 document.getElementById('experimentsLink').style.display = 'none';
@@ -209,7 +214,6 @@
             }
         }
 
-        // تشغيل التحقق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>

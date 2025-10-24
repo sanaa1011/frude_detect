@@ -164,7 +164,7 @@ def prepare_data(df):
     final_columns = [
         'type', 'amount', 'old_balance', 'new_balance',
         'branch', 'currency', 'device', 'location',
-        'hour', 'dayofweek', 'balance_diff', 'amount_ratio'
+        'hour', 'dayofweek' , 'balance_diff', 'amount_ratio'
     ]
 
     print("✅ Final columns for model:", final_columns)
@@ -314,7 +314,7 @@ def predict_route():
         df_prepared = prepare_data(df.copy())
 
         model = CatBoostClassifier()
-        model.load_model("fra_catboost_model.cbm")
+        model.load_model("fraud_catboost_model.cbm")
         print("🤖 Model loaded successfully.")
 
         model_features = model.feature_names_

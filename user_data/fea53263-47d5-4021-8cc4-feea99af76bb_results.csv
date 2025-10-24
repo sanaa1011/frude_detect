@@ -1,0 +1,51 @@
+user_id,transaction_date,type,amount,old_balance,new_balance,balance_mismatch,amount_spike,destination_account,new_destination,blacklisted_dest,source_account,branch,currency,device,device_change,ip,ip_unusual,location,odd_hour,velocity,predicted_fraud,fraud_probability
+U01,2025-06-07 06:05:00,Online Purchase,1164.48,4880.38,3715.9,0,0,Merchant435,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Riyadh,0,0,0,39.5
+U01,2025-06-10 12:32:00,Deposit,966.48,4190.26,5156.74,0,0,Merchant478,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Dammam,0,0,0,21.74
+U01,2025-06-12 19:53:00,Deposit,11977.83,40865.34,44969.61,1,1,Merchant2,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.110,1,Dammam,0,0,1,79.09
+U01,2025-06-13 09:42:00,Transfer,177.0,48494.44,48317.44,0,0,Dest44,0,0,SrcU01,Riyadh,SAR,iPhone,0,10.0.0.26,0,Dammam,0,0,0,21.4
+U01,2025-06-14 13:12:00,Withdrawal,905.69,38869.07,37963.38,0,0,Merchant230,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,0,0,0,19.0
+U01,2025-06-15 15:27:00,Withdrawal,5887.03,8940.94,8076.31,0,1,Merchant2,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,0,0,1,80.44
+U01,2025-06-16 13:37:00,Transfer,591.53,14406.26,13814.73,0,0,Dest44,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.172,1,Dammam,0,0,0,19.0
+U01,2025-06-18 22:31:00,Withdrawal,703.75,25954.6,25250.85,0,0,Dest1160,1,0,SrcU01,Riyadh,SAR,iPhone,0,10.0.0.190,0,Dammam,0,0,0,16.24
+U01,2025-06-21 20:24:00,Deposit,327.68,14961.16,15288.84,0,0,Merchant474,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,0,0,0,16.05
+U01,2025-06-29 06:42:00,Withdrawal,582.67,15893.62,15310.95,0,0,Merchant169,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Dammam,0,0,0,37.45
+U01,2025-07-01 14:25:00,Withdrawal,1316.74,27363.46,26046.72,0,0,Merchant331,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,0,0,0,20.13
+U01,2025-07-05 15:38:00,Deposit,488.18,773.34,1261.52,0,0,Merchant176,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Riyadh,0,0,0,20.55
+U01,2025-07-11 02:41:00,Withdrawal,961.78,18634.91,22369.65,1,0,Merchant468,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.140,1,Dammam,1,1,1,54.79
+U01,2025-07-11 02:42:00,Withdrawal,672.25,22287.55,21615.3,0,0,Merchant186,0,0,SrcU01,Jeddah,SAR,iPhone,0,10.0.0.71,0,Riyadh,0,1,1,57.36
+U01,2025-07-11 02:43:00,Transfer,12661.63,15929.7,16023.66,1,1,Dest972,1,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,1,1,1,93.03
+U01,2025-07-15 16:27:00,Transfer,6871.9,44417.03,43217.16,0,1,Dest919,1,0,SrcU01,Riyadh,SAR,iPhone,0,10.0.0.137,1,Riyadh,0,0,1,79.88
+U01,2025-07-17 19:04:00,Online Purchase,1459.67,23874.64,22414.97,0,0,Merchant472,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.71,0,Dammam,0,0,0,17.04
+U01,2025-07-19 04:47:00,Deposit,551.51,30573.47,28106.07,1,0,Dest1093,1,0,SrcU01,Riyadh,SAR,Windows,1,10.0.0.71,0,Dammam,1,0,1,50.94
+U01,2025-07-19 06:24:00,Deposit,5431.16,10201.15,6095.58,1,1,Merchant402,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.123,1,Dammam,0,0,1,87.34
+U01,2025-07-23 13:17:00,Withdrawal,663.88,31353.26,30689.38,0,0,Merchant360,0,0,SrcU01,Dammam,SAR,Windows,0,10.0.0.146,1,Riyadh,0,1,0,18.91
+U01,2025-07-23 13:17:00,Deposit,1256.61,4165.21,5421.82,0,0,Merchant461,0,0,SrcU01,Riyadh,SAR,Android,0,10.0.0.71,0,Dammam,0,1,0,23.26
+U01,2025-07-23 13:18:00,Withdrawal,1511.95,10383.85,8871.9,0,0,Merchant382,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.71,0,Riyadh,0,1,0,20.13
+U01,2025-08-02 08:48:00,Transfer,805.18,2202.23,1397.05,0,0,Dest187,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.71,0,Riyadh,0,0,0,25.32
+U01,2025-08-04 22:10:00,Withdrawal,667.76,13931.78,13264.02,0,0,Merchant261,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.71,0,Jeddah,0,0,0,15.5
+U01,2025-08-05 13:17:00,Transfer,228.29,26243.37,21553.08,1,0,Dest892,1,0,SrcU01,Dammam,SAR,Windows,0,10.0.0.190,0,Riyadh,0,0,0,18.91
+U01,2025-08-09 12:45:00,Deposit,306.23,45511.36,45817.59,0,0,Merchant344,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.7,0,Riyadh,0,0,0,18.74
+U01,2025-08-11 03:32:00,Withdrawal,1304.26,38677.88,33452.53,1,0,Dest1133,1,0,SrcU01,Dammam,SAR,Windows,1,10.0.0.190,0,Riyadh,1,0,1,55.68
+U01,2025-08-18 22:00:00,Transfer,627.63,49350.9,48723.27,0,0,Dest187,0,0,SrcU01,Dammam,SAR,Windows,0,10.0.0.7,0,Riyadh,0,0,0,15.38
+U01,2025-08-19 10:59:00,Online Purchase,410.64,43223.62,42812.98,0,0,Merchant443,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Dammam,0,0,0,18.26
+U01,2025-08-20 15:53:00,Transfer,524.63,34369.53,33844.9,0,0,Dest813,1,0,SrcU01,Dammam,SAR,Windows,1,10.0.0.136,0,Dammam,0,0,0,18.91
+U01,2025-08-24 21:09:00,Withdrawal,756.37,19739.53,18983.16,0,0,Merchant112,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.190,0,Dammam,0,0,0,15.5
+U01,2025-08-26 16:01:00,Withdrawal,4715.85,16596.57,15873.65,0,1,Merchant497,0,0,SrcU01,Dammam,SAR,iPhone,0,10.0.0.48,1,Dammam,0,0,1,81.09
+U02,2025-06-02 19:52:00,Transfer,1574.17,25781.99,24207.82,0,0,Dest171,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.174,0,Riyadh,0,0,0,17.15
+U02,2025-06-05 13:18:00,Bill Payment,1587.1,24727.91,23140.81,0,0,Merchant360,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.161,0,Dammam,0,0,0,23.5
+U02,2025-06-09 19:26:00,Deposit,1232.56,46520.03,47752.59,0,0,Merchant239,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.190,0,Riyadh,0,0,0,18.6
+U02,2025-06-10 15:15:00,Deposit,1604.85,37899.78,39504.63,0,0,Merchant164,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.190,0,Dammam,0,0,0,23.17
+U02,2025-06-12 13:43:00,Deposit,1479.35,26375.28,27854.63,0,0,Merchant413,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.174,0,Dammam,0,0,0,22.68
+U02,2025-06-14 15:54:00,Transfer,1585.37,844.13,-741.24,0,0,Dest179,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.174,0,Riyadh,0,0,0,21.88
+U02,2025-06-16 06:40:00,Transfer,1512.69,9131.14,10299.91,1,0,Dest1195,1,0,SrcU02,Riyadh,SAR,iPhone,1,10.0.0.9,1,Riyadh,0,0,0,38.3
+U02,2025-06-20 10:51:00,Transfer,1510.03,3048.2,1538.17,0,0,Dest84,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.190,0,Riyadh,0,0,0,21.88
+U02,2025-06-21 15:06:00,Transfer,14148.7,21641.84,20255.71,0,1,Dest790,0,0,SrcU02,Riyadh,SAR,Android,0,10.0.0.51,0,Dammam,0,0,1,80.14
+U02,2025-06-23 21:33:00,Transfer,1043.04,27020.85,25977.81,0,0,Dest386,0,0,SrcU02,Jeddah,SAR,Windows,0,10.0.0.27,0,Riyadh,0,0,0,17.4
+U02,2025-06-25 00:42:00,Transfer,14524.49,12963.22,7760.33,1,1,Dest179,0,0,SrcU02,Riyadh,SAR,iPhone,0,10.0.0.85,1,Dammam,1,0,1,93.52
+U02,2025-06-25 22:23:00,Transfer,995.51,32436.05,31440.54,0,0,Dest105,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.174,0,Riyadh,0,0,0,17.15
+U02,2025-07-01 10:30:00,Transfer,11868.48,11782.79,7561.86,1,1,Dest1025,1,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.190,0,Dammam,0,0,1,80.53
+U02,2025-07-12 14:01:00,Withdrawal,1938.84,31859.72,29920.88,0,0,Merchant493,0,0,SrcU02,Riyadh,SAR,iPhone,0,10.0.0.173,0,Dammam,0,0,0,40.64
+U02,2025-07-13 16:42:00,Withdrawal,4755.24,2518.37,1343.96,0,1,Dest1171,1,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.174,0,Dammam,0,1,1,75.2
+U02,2025-07-13 16:44:00,Withdrawal,1800.18,44856.52,43056.34,0,0,Merchant491,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.52,0,Dammam,0,1,0,27.59
+U02,2025-07-13 16:45:00,Transfer,1521.8,40468.29,38946.49,0,0,Dest105,0,0,SrcU02,Riyadh,SAR,Android,0,10.0.0.27,0,Dammam,0,1,0,20.55
+U02,2025-07-25 04:17:00,Bill Payment,14086.08,16060.62,13960.78,1,1,Merchant357,0,0,SrcU02,Riyadh,SAR,Windows,0,10.0.0.27,0,Riyadh,1,0,1,92.23
