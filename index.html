@@ -42,16 +42,6 @@
                 color: #ff9f43;
             }
             
-            @media (max-width: 768px) {
-                .nav-container {
-                    flex-direction: column;
-                    gap: 15px;
-                }
-                .nav-links {
-                    gap: 15px;
-                }
-            }
-
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh;
@@ -296,17 +286,6 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .chart-placeholder {
-            height: 300px;
-            background: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 5px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
         .file-info {
             background: #e8f4fc;
             padding: 15px;
@@ -369,33 +348,6 @@
             color: #2ecc71;
         }
 
-        .looker-dashboard {
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .looker-dashboard h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-
-        .dashboard-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .dashboard-iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
-
         .probability-high {
             color: #e74c3c;
             font-weight: bold;
@@ -408,6 +360,93 @@
 
         .probability-low {
             color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* New Analytics Dashboard Styles */
+        .dashboard-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .anomaly-insights {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+        .insight-item.warning {
+            border-left-color: #f39c12;
+            background: #fef9e7;
+        }
+
+        .insight-item.success {
+            border-left-color: #27ae60;
+            background: #e8f6f3;
+        }
+
+        .insight-item.info {
+            border-left-color: #3498db;
+            background: #ebf5fb;
+        }
+
+        .insight-item i {
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .comparison-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .comparison-controls select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .comparison-table {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .current-file {
+            background-color: #fff9e6 !important;
             font-weight: bold;
         }
 
@@ -424,8 +463,13 @@
                 flex-direction: column;
             }
 
-            .dashboard-iframe {
-                height: 300px;
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-controls {
+                flex-direction: column;
+                align-items: stretch;
             }
 
             table {
@@ -436,6 +480,38 @@
                 padding: 8px 10px;
             }
         }
+        .chart-container {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    height: 300px; /* ارتفاع ثابت لجميع الرسوم البيانية */
+    position: relative;
+}
+
+.chart-container canvas {
+    max-height: 250px;
+    width: 100% !important;
+}
+
+/* تحسين التخطيط للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .chart-container {
+        height: 280px;
+        padding: 12px;
+    }
+    
+    .chart-container canvas {
+        max-height: 230px;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -502,8 +578,8 @@
                             <i class="fas fa-play"></i> Process File
                         </button>
                     </div>
-                    <!-- استبدل قسم upload options في index.html بهذا الكود -->
-                     <div class="upload-options" style="margin: 20px 0; text-align: center;">
+                    
+                    <div class="upload-options" style="margin: 20px 0; text-align: center;">
                         <label style="display: block; margin-bottom: 10px; color: #2c3e50; font-weight: bold;">
                             Save Results:
                         </label>
@@ -568,27 +644,26 @@
                     </div>
                     
                     <div style="overflow-x: auto;">
-                        <!-- في قسم النتائج، عدّل الجدول -->
-                     <table id="resultsTable">
-                        <thead>
-                            <tr>
-                                <th>User ID</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Old Balance</th>
-                                <th>New Balance</th>
-                                <th>Source Account</th>
-                                <th>Destination Account</th>
-                                <th>Branch</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="10" style="text-align: center;">No data available. Please upload a file.</td>
-                            </tr>
-                        </tbody>
-                     </table>
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Old Balance</th>
+                                    <th>New Balance</th>
+                                    <th>Source Account</th>
+                                    <th>Destination Account</th>
+                                    <th>Branch</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="9" style="text-align: center;">No data available. Please upload a file.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                     
                     <div style="margin-top: 20px; text-align: center;">
@@ -603,39 +678,113 @@
                 
                 <!-- Analytics Page -->
                 <div id="analytics" class="page">
-                    <iframe title="realistic dataset" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=9491eb5f-15ee-4e63-b09d-4152ac085e2c&autoAuth=true&ctid=1c8c2813-e9c8-49c1-b154-d4ce317d25e9" frameborder="0" allowFullScreen="true"></iframe>
-                    <!-- <h2>Fraud Analytics Dashboard</h2>
-                    <p>Visual representation of fraud patterns in your transaction data.</p>
+                    <h2>📊 Fraud Analytics Dashboard</h2>
+                    <p>Advanced analysis of anomaly patterns and fraud detection in transaction data</p>
                     
-                    <div class="stats-container">
-                        <div class="stat-card">
-                            <div class="stat-label">Highest Fraud Amount</div>
-                            <div class="stat-value fraud-stat" id="highestFraud">$0.00</div>
+                    <!-- Current File Analysis Section -->
+                    <div class="dashboard-section">
+                        <h3><i class="fas fa-chart-bar"></i> Current File Analysis</h3>
+                        
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div class="stat-label">Highest Fraud Amount</div>
+                                <div class="stat-value fraud-stat" id="highestFraud">$0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Most Common Fraud Type</div>
+                                <div class="stat-value fraud-stat" id="commonType">N/A</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Average Fraud Probability</div>
+                                <div class="stat-value fraud-stat" id="avgProbability">0%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Most Common Fraud Hour</div>
+                                <div class="stat-value fraud-stat" id="commonHour">N/A</div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Most Common Fraud Type</div>
-                            <div class="stat-value fraud-stat" id="commonType">N/A</div>
+                        
+                        <div class="charts-row">
+                            <div class="chart-container">
+                                <h3>Fraud Distribution by Transaction Type</h3>
+                                <canvas id="typeChart" height="250"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h3>Fraud Amount Distribution</h3>
+                                <canvas id="amountChart" height="250"></canvas>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Average Fraud Probability</div>
-                            <div class="stat-value fraud-stat" id="avgProbability">0%</div>
+                        
+                        <div class="charts-row">
+                            <div class="chart-container">
+                                <h3>Fraud Probability Distribution</h3>
+                                <canvas id="probabilityChart" height="250"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h3>Fraud Patterns by Hour of Day</h3>
+                                <canvas id="hourlyChart" height="250"></canvas>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>Fraud Distribution by Transaction Type</h3>
-                        <canvas id="typeChart" height="300"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>Fraud Amount Distribution</h3>
-                        <canvas id="amountChart" height="300"></canvas>
-                    </div>
 
-                    <div class="chart-container">
-                        <h3>Fraud Probability Distribution</h3>
-                        <canvas id="probabilityChart" height="300"></canvas>
-                    </div> -->
+                        <div class="chart-container full-width">
+                            <h3>Anomaly Detection Insights</h3>
+                            <div class="anomaly-insights" id="anomalyInsights">
+                                <div class="insight-item">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Upload a file to see anomaly analysis</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Comparison Section -->
+                    <div class="dashboard-section">
+                        <h3><i class="fas fa-exchange-alt"></i> Files Comparison</h3>
+                        
+                        <div class="comparison-controls">
+                            <button class="btn btn-primary" onclick="loadComparisonData()">
+                                <i class="fas fa-sync-alt"></i> Refresh Comparison Data
+                            </button>
+                            <select id="comparisonMetric" onchange="updateComparisonCharts()">
+                                <option value="fraud_rate">Fraud Rate</option>
+                                <option value="fraud_count">Fraud Cases</option>
+                                <option value="avg_amount">Average Amount</option>
+                                <option value="total_amount">Total Amount</option>
+                            </select>
+                        </div>
+                        
+                        <div class="charts-row">
+                            <div class="chart-container">
+                                <h3>Fraud Rate Comparison</h3>
+                                <canvas id="comparisonChart" height="300"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h3>Fraud Trends Over Time</h3>
+                                <canvas id="trendChart" height="300"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-table">
+                            <h3>Comparison Summary</h3>
+                            <table id="comparisonTable">
+                                <thead>
+                                    <tr>
+                                        <th>Filename</th>
+                                        <th>Total Transactions</th>
+                                        <th>Fraud Cases</th>
+                                        <th>Fraud Rate</th>
+                                        <th>Highest Amount</th>
+                                        <th>Avg Probability</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" style="text-align: center;">No comparison data available yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -652,87 +801,86 @@
         let typeChart = null;
         let amountChart = null;
         let probabilityChart = null;
+        let hourlyChart = null;
+        let comparisonChart = null;
+        let trendChart = null;
+        let comparisonData = [];
 
-        function getSaveOption() {
-    const selectedOption = document.querySelector('input[name="saveOption"]:checked');
-    return selectedOption ? selectedOption.value : 'guest';
-}
         // دالة لتحديث خيارات الحفظ بناءً على حالة المستخدم
-async function updateSaveOptions() {
-    try {
-        const response = await fetch('/api/auth-status');
-        const data = await response.json();
-        
-        const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
-        const saveOptionLabel = document.getElementById('saveOptionLabel');
-        const saveOptionText = document.getElementById('saveOptionText');
-        
-        if (data.logged_in) {
-            // المستخدم مسجل - تفعيل خيار الحفظ
-            saveOptionInput.disabled = false;
-            saveOptionLabel.style.color = '#2c3e50';
-            saveOptionText.innerHTML = 'Save to My Account';
-            saveOptionText.style.color = '#2c3e50';
-        } else {
-            // المستخدم غير مسجل - تعطيل خيار الحفظ وعرض رابط التسجيل
-            saveOptionInput.disabled = true;
-            saveOptionLabel.style.color = '#7f8c8d';
-            saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
+        async function updateSaveOptions() {
+            try {
+                const response = await fetch('/api/auth-status');
+                const data = await response.json();
+                
+                const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
+                const saveOptionLabel = document.getElementById('saveOptionLabel');
+                const saveOptionText = document.getElementById('saveOptionText');
+                
+                if (data.logged_in) {
+                    // المستخدم مسجل - تفعيل خيار الحفظ
+                    saveOptionInput.disabled = false;
+                    saveOptionLabel.style.color = '#2c3e50';
+                    saveOptionText.innerHTML = 'Save to My Account';
+                    saveOptionText.style.color = '#2c3e50';
+                } else {
+                    // المستخدم غير مسجل - تعطيل خيار الحفظ وعرض رابط التسجيل
+                    saveOptionInput.disabled = true;
+                    saveOptionLabel.style.color = '#7f8c8d';
+                    saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
+                }
+            } catch (error) {
+                console.log('Error checking auth status:', error);
+                // في حالة الخطأ، نعرض الحالة الافتراضية (غير مسجل)
+                const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
+                const saveOptionLabel = document.getElementById('saveOptionLabel');
+                const saveOptionText = document.getElementById('saveOptionText');
+                
+                saveOptionInput.disabled = true;
+                saveOptionLabel.style.color = '#7f8c8d';
+                saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
+            }
         }
-    } catch (error) {
-        console.log('Error checking auth status:', error);
-        // في حالة الخطأ، نعرض الحالة الافتراضية (غير مسجل)
-        const saveOptionInput = document.querySelector('input[name="saveOption"][value="save"]');
-        const saveOptionLabel = document.getElementById('saveOptionLabel');
-        const saveOptionText = document.getElementById('saveOptionText');
-        
-        saveOptionInput.disabled = true;
-        saveOptionLabel.style.color = '#7f8c8d';
-        saveOptionText.innerHTML = '<a href="/register" style="color: #3498db;">Sign up to save results</a>';
-    }
-}
 
-// تحديث خيارات الحفظ عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    updateSaveOptions();
-    checkAuthStatus(); // استدعاء الدالة التي أضفناها سابقاً للـ navigation
-});
+        // تحديث خيارات الحفظ عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSaveOptions();
+            checkAuthStatus(); // استدعاء الدالة التي أضفناها سابقاً للـ navigation
+        });
+
         // التحقق من حالة المستخدم
-async function checkAuthStatus() {
-    try {
-        const response = await fetch('/api/auth-status');
-        const data = await response.json();
-        
-        if (data.logged_in) {
-            document.getElementById('loginLink').style.display = 'none';
-            document.getElementById('registerLink').style.display = 'none';
-            document.getElementById('experimentsLink').style.display = 'block';
-            document.getElementById('logoutLink').style.display = 'block';
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/auth-status');
+                const data = await response.json();
+                
+                if (data.logged_in) {
+                    document.getElementById('loginLink').style.display = 'none';
+                    document.getElementById('registerLink').style.display = 'none';
+                    document.getElementById('experimentsLink').style.display = 'block';
+                    document.getElementById('logoutLink').style.display = 'block';
+                }
+            } catch (error) {
+                console.log('User not logged in');
+            }
         }
-    } catch (error) {
-        console.log('User not logged in');
-    }
-}
 
-// دالة تسجيل الخروج
-async function logout() {
-    try {
-        const response = await fetch('/logout');
-        if (response.ok) {
-            window.location.href = '/';
+        // دالة تسجيل الخروج
+        async function logout() {
+            try {
+                const response = await fetch('/logout');
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
         }
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-}
-
-// تشغيل التحقق عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', checkAuthStatus);
 
         function getSaveOption() {
             const selectedOption = document.querySelector('input[name="saveOption"]:checked');
             return selectedOption ? selectedOption.value : 'guest';
         }
+
         // Page navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
@@ -814,115 +962,112 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
         
         // Process the uploaded file
         function processFile() {
-    const fileInput = document.getElementById('fileInput');
-    if (!fileInput.files.length) {
-        showError('Please select a file first');
-        return;
-    }
-    
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('saveOption', getSaveOption());
-    
-    // Show loading state
-    const processBtn = document.querySelector('.btn-success');
-    const originalText = processBtn.innerHTML;
-    processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    processBtn.disabled = true;
-    document.getElementById('loader').style.display = 'block';
-    hideAlerts();
-    
-    // Send to backend
-    fetch('/predict', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                showError('Please select a file first');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('saveOption', getSaveOption());
+            
+            // Show loading state
+            const processBtn = document.querySelector('.btn-success');
+            const originalText = processBtn.innerHTML;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            processBtn.disabled = true;
+            document.getElementById('loader').style.display = 'block';
+            hideAlerts();
+            
+            // Send to backend
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                currentData = data;
+                displayResults(data);
+                showSuccess('File processed successfully!');
+                showPage('results');
+            })
+            .catch(error => {
+                showError('Error: ' + error.message);
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                // Reset button
+                processBtn.innerHTML = '<i class="fas fa-play"></i> Process File';
+                processBtn.disabled = false;
+                document.getElementById('loader').style.display = 'none';
+            });
         }
-        return response.json();
-    })
-    .then(data => {
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        currentData = data;
-        displayResults(data);
-        showSuccess('File processed successfully!');
-        showPage('results');
-    })
-    .catch(error => {
-        showError('Error: ' + error.message);
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        // Reset button
-        processBtn.innerHTML = '<i class="fas fa-play"></i> Process File';
-        processBtn.disabled = false;
-        document.getElementById('loader').style.display = 'none';
-    });
-}
         
         // Display results from backend
         function displayResults(data) {
-            const total = data.total_count || (data.data ? data.data.length : 0);
-            const frauds = data.fraud_count !== undefined ? data.fraud_count : (data.data ? data.data.filter(t => t.predicted_fraud === 1).length : 0);
+            document.getElementById('totalTransactions').textContent = data.total_count;
+            document.getElementById('fraudTransactions').textContent = data.fraud_count;
+            document.getElementById('legitTransactions').textContent = data.total_count - data.fraud_count;
+            document.getElementById('fraudRate').textContent = data.fraud_rate + "%";
 
-    document.getElementById('totalTransactions').textContent = data.total_count;
-    document.getElementById('fraudTransactions').textContent = data.fraud_count;
-    document.getElementById('legitTransactions').textContent = data.total_count - data.fraud_count;
+            const tableBody = document.querySelector('#resultsTable tbody');
+            tableBody.innerHTML = '';
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    if (transaction.predicted_fraud === 1) {
+                        row.classList.add('fraud-row');
+                    }
 
-    const fraudRate = total > 0 ? ((frauds / total) * 100).toFixed(2) : 0;
-    document.getElementById('fraudRate').textContent = fraudRate + "%";
+                    row.innerHTML = `
+                        <td>${transaction.user_id || 'N/A'}</td>
+                        <td>${transaction.type || 'N/A'}</td>
+                        <td>${transaction.amount ? '$' + parseFloat(transaction.amount).toLocaleString() : 'N/A'}</td>
+                        <td>${transaction.old_balance ? '$' + parseFloat(transaction.old_balance).toLocaleString() : 'N/A'}</td>
+                        <td>${transaction.new_balance ? '$' + parseFloat(transaction.new_balance).toLocaleString() : 'N/A'}</td>
+                        <td>${transaction.source_account || 'N/A'}</td>
+                        <td>${transaction.destination_account || 'N/A'}</td>
+                        <td>${transaction.branch || 'N/A'}</td>
+                        <td>${transaction.predicted_fraud === 1 ? 
+                            '<span style="color: #e74c3c;"><i class="fas fa-exclamation-circle"></i> Fraud</span>' : 
+                            '<span style="color: #27ae60;"><i class="fas fa-check-circle"></i> Legitimate</span>'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
 
-    const tableBody = document.querySelector('#resultsTable tbody');
-    tableBody.innerHTML = '';
-    if (data.data && data.data.length > 0) {
-        data.data.forEach(transaction => {
-            const row = document.createElement('tr');
-            if (transaction.predicted_fraud === 1) {
-                row.classList.add('fraud-row');
+                // إذا كان فيه أكثر من 50 معاملة
+                if (data.total_count > 50) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="9" style="text-align: center;">
+                            Showing 50 of ${data.total_count} transactions
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            } else {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center;">No data available in the uploaded file.</td>
+                    </tr>
+                `;
             }
 
-            row.innerHTML = `
-                <td>${transaction.user_id || 'N/A'}</td>
-                <td>${transaction.type || 'N/A'}</td>
-                <td>${transaction.amount ? '$' + parseFloat(transaction.amount).toLocaleString() : 'N/A'}</td>
-                <td>${transaction.old_balance ? '$' + parseFloat(transaction.old_balance).toLocaleString() : 'N/A'}</td>
-                <td>${transaction.new_balance ? '$' + parseFloat(transaction.new_balance).toLocaleString() : 'N/A'}</td>
-                <td>${transaction.source_account || 'N/A'}</td>
-                <td>${transaction.destination_account || 'N/A'}</td>
-                <td>${transaction.branch || 'N/A'}</td>
-                <td>${transaction.predicted_fraud === 1 ? 
-                    '<span style="color: #e74c3c;"><i class="fas fa-exclamation-circle"></i> Fraud</span>' : 
-                    '<span style="color: #27ae60;"><i class="fas fa-check-circle"></i> Legitimate</span>'}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // إذا كان فيه أكثر من 50 معاملة
-        if (data.total_count > 50) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td colspan="9" style="text-align: center;">
-                    Showing 50 of ${data.total_count} transactions
-                </td>
-            `;
-            tableBody.appendChild(row);
+            // Update analytics
+            updateAnalytics(data);
         }
-    } else {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="9" style="text-align: center;">No data available in the uploaded file.</td>
-            </tr>
-        `;
-    }
-}
 
-        
         // Update analytics page with data
         function updateAnalytics(data) {
             if (!data.data) return;
@@ -932,6 +1077,7 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
             let commonType = {};
             let totalProbability = 0;
             let fraudCount = 0;
+            let hourCounts = {};
             
             data.data.forEach(t => {
                 if (t.predicted_fraud === 1) {
@@ -949,6 +1095,12 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
                     if (t.fraud_probability) {
                         totalProbability += parseFloat(t.fraud_probability);
                         fraudCount++;
+                    }
+
+                    // Count by hour
+                    if (t.transaction_date) {
+                        const hour = new Date(t.transaction_date).getHours();
+                        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
                     }
                 }
             });
@@ -970,6 +1122,17 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
             // Calculate average probability
             const avgProbability = fraudCount > 0 ? (totalProbability / fraudCount).toFixed(2) : 0;
             document.getElementById('avgProbability').textContent = avgProbability + '%';
+
+            // Find most common fraud hour
+            let mostCommonHour = 'N/A';
+            let maxHourCount = 0;
+            for (const hour in hourCounts) {
+                if (hourCounts[hour] > maxHourCount) {
+                    mostCommonHour = hour + ':00';
+                    maxHourCount = hourCounts[hour];
+                }
+            }
+            document.getElementById('commonHour').textContent = mostCommonHour;
             
             // Render charts if we're on the analytics page
             if (document.getElementById('analytics').classList.contains('active')) {
@@ -1019,40 +1182,75 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
             if (amountChart) amountChart.destroy();
             if (probabilityChart) probabilityChart.destroy();
             
-            // Create fraud by type chart
-            const typeCtx = document.getElementById('typeChart').getContext('2d');
-            typeChart = new Chart(typeCtx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(fraudByType),
-                    datasets: [{
-                        label: 'Fraudulent Transactions',
-                        data: Object.values(fraudByType),
-                        backgroundColor: '#e74c3c',
-                        borderColor: '#c0392b',
-                        borderWidth: 1
-                    }]
+           // في دالة renderCharts، استبدل مخطط توزيع الاحتيال حسب نوع المعاملة بهذا الكود:
+
+// Create fraud by type chart
+const typeCtx = document.getElementById('typeChart').getContext('2d');
+typeChart = new Chart(typeCtx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(fraudByType),
+        datasets: [{
+            label: 'Fraudulent',
+            data: Object.values(fraudByType),
+            backgroundColor: '#e74c3c',
+            borderColor: '#c0392b',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Fraud by Transaction Type',
+                font: {
+                    size: 14,
+                    weight: 'bold'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Fraud Distribution by Transaction Type'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Fraudulent Transactions'
-                            }
-                        }
+                padding: 10
+            },
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Count',
+                    font: {
+                        size: 12
+                    }
+                },
+                ticks: {
+                    font: {
+                        size: 11
                     }
                 }
-            });
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: 11
+                    },
+                    maxRotation: 45,
+                    minRotation: 0
+                }
+            }
+        },
+        layout: {
+            padding: {
+                top: 10,
+                right: 10,
+                bottom: 10,
+                left: 10
+            }
+        }
+    }
+});
             
             // Create fraud amount distribution chart
             const amountCtx = document.getElementById('amountChart').getContext('2d');
@@ -1127,6 +1325,333 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
                     }
                 }
             });
+
+            // Render hourly chart and insights
+            renderHourlyChart();
+            updateAnomalyInsights();
+            loadComparisonData();
+        }
+
+        // Render hourly fraud patterns chart
+        function renderHourlyChart() {
+            if (!currentData.data) return;
+            
+            const hourlyFraud = Array(24).fill(0);
+            const hourlyTotal = Array(24).fill(0);
+            
+            currentData.data.forEach(t => {
+                if (t.transaction_date) {
+                    const hour = new Date(t.transaction_date).getHours();
+                    hourlyTotal[hour]++;
+                    if (t.predicted_fraud === 1) {
+                        hourlyFraud[hour]++;
+                    }
+                }
+            });
+            
+            const hourlyRate = hourlyTotal.map((total, i) => 
+                total > 0 ? (hourlyFraud[i] / total * 100).toFixed(1) : 0
+            );
+            
+            const hourLabels = Array.from({length: 24}, (_, i) => `${i}:00`);
+            
+            if (hourlyChart) hourlyChart.destroy();
+            
+            const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+            hourlyChart = new Chart(hourlyCtx, {
+                type: 'line',
+                data: {
+                    labels: hourLabels,
+                    datasets: [{
+                        label: 'Fraud Rate (%)',
+                        data: hourlyRate,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Fraud Patterns by Hour of Day'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fraud Rate (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour of Day'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update anomaly detection insights
+        function updateAnomalyInsights() {
+            if (!currentData.data) return;
+            
+            const insights = [];
+            const fraudData = currentData.data.filter(t => t.predicted_fraud === 1);
+            
+            if (fraudData.length === 0) {
+                insights.push({
+                    icon: 'fa-check-circle',
+                    text: 'No fraud cases detected in this file',
+                    type: 'success'
+                });
+            } else {
+                // Analyze amounts
+                const amounts = fraudData.map(t => parseFloat(t.amount || 0));
+                const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+                const maxAmount = Math.max(...amounts);
+                
+                if (maxAmount > avgAmount * 5) {
+                    insights.push({
+                        icon: 'fa-money-bill-wave',
+                        text: `Detected fraudulent transactions with very high amounts (max: $${maxAmount.toLocaleString()})`,
+                        type: 'warning'
+                    });
+                }
+                
+                // Analyze time patterns
+                const fraudHours = fraudData.map(t => 
+                    t.transaction_date ? new Date(t.transaction_date).getHours() : 12
+                );
+                const nightFrauds = fraudHours.filter(h => h < 6 || h > 22).length;
+                
+                if (nightFrauds > fraudData.length * 0.3) {
+                    insights.push({
+                        icon: 'fa-moon',
+                        text: `High percentage of fraud (${Math.round(nightFrauds/fraudData.length*100)}%) occurs during night hours`,
+                        type: 'info'
+                    });
+                }
+                
+                // Analyze transaction types
+                const typeCounts = {};
+                fraudData.forEach(t => {
+                    typeCounts[t.type] = (typeCounts[t.type] || 0) + 1;
+                });
+                
+                const dominantType = Object.keys(typeCounts).reduce((a, b) => 
+                    typeCounts[a] > typeCounts[b] ? a : b
+                );
+                
+                insights.push({
+                    icon: 'fa-chart-pie',
+                    text: `Transaction type "${dominantType}" represents ${Math.round(typeCounts[dominantType]/fraudData.length*100)}% of fraud cases`,
+                    type: 'info'
+                });
+
+                // High probability concentration
+                const highProbFrauds = fraudData.filter(t => (t.fraud_probability || 0) > 80).length;
+                if (highProbFrauds > fraudData.length * 0.5) {
+                    insights.push({
+                        icon: 'fa-chart-line',
+                        text: `${Math.round(highProbFrauds/fraudData.length*100)}% of fraud cases have very high confidence (>80%)`,
+                        type: 'info'
+                    });
+                }
+            }
+            
+            // Update UI
+            const insightsContainer = document.getElementById('anomalyInsights');
+            insightsContainer.innerHTML = insights.map(insight => `
+                <div class="insight-item ${insight.type}">
+                    <i class="fas ${insight.icon}"></i>
+                    <span>${insight.text}</span>
+                </div>
+            `).join('');
+        }
+
+        // Load comparison data
+        async function loadComparisonData() {
+            try {
+                // In production, this would come from the database
+                // Using sample data for demonstration
+                comparisonData = [
+                    {
+                        filename: 'Current File',
+                        total_count: currentData.total_count,
+                        fraud_count: currentData.fraud_count,
+                        fraud_rate: currentData.fraud_rate,
+                        max_amount: calculateMaxAmount(),
+                        avg_probability: calculateAvgProbability()
+                    },
+                    // Additional comparison data
+                    {
+                        filename: 'January Data',
+                        total_count: 1500,
+                        fraud_count: 45,
+                        fraud_rate: 3.0,
+                        max_amount: 12500,
+                        avg_probability: 68.5
+                    },
+                    {
+                        filename: 'February Data',
+                        total_count: 1800,
+                        fraud_count: 72,
+                        fraud_rate: 4.0,
+                        max_amount: 18700,
+                        avg_probability: 72.3
+                    },
+                    {
+                        filename: 'March Data',
+                        total_count: 2200,
+                        fraud_count: 55,
+                        fraud_rate: 2.5,
+                        max_amount: 9200,
+                        avg_probability: 65.8
+                    }
+                ];
+                
+                updateComparisonCharts();
+                updateComparisonTable();
+                
+            } catch (error) {
+                console.error('Error loading comparison data:', error);
+            }
+        }
+
+        // Update comparison charts
+        function updateComparisonCharts() {
+            const metric = document.getElementById('comparisonMetric').value;
+            
+            // Comparison chart
+            if (comparisonChart) comparisonChart.destroy();
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            
+            comparisonChart = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: comparisonData.map(d => d.filename),
+                    datasets: [{
+                        label: getMetricLabel(metric),
+                        data: comparisonData.map(d => d[getMetricProperty(metric)]),
+                        backgroundColor: comparisonData.map((_, i) => 
+                            i === 0 ? '#e74c3c' : '#3498db'
+                        )
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Files Performance Comparison'
+                        }
+                    }
+                }
+            });
+            
+            // Trends chart
+            renderTrendChart();
+        }
+
+        // Render trends chart
+        function renderTrendChart() {
+            if (trendChart) trendChart.destroy();
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            
+            trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: comparisonData.map(d => d.filename),
+                    datasets: [{
+                        label: 'Fraud Rate',
+                        data: comparisonData.map(d => d.fraud_rate),
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Fraud Rate Trends'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fraud Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update comparison table
+        function updateComparisonTable() {
+            const tableBody = document.querySelector('#comparisonTable tbody');
+            
+            tableBody.innerHTML = comparisonData.map(file => `
+                <tr ${file.filename === 'Current File' ? 'class="current-file"' : ''}>
+                    <td>${file.filename}</td>
+                    <td>${file.total_count.toLocaleString()}</td>
+                    <td>${file.fraud_count.toLocaleString()}</td>
+                    <td>${file.fraud_rate}%</td>
+                    <td>$${file.max_amount.toLocaleString()}</td>
+                    <td>${file.avg_probability}%</td>
+                </tr>
+            `).join('');
+        }
+
+        // Helper functions
+        function calculateMaxAmount() {
+            if (!currentData.data) return 0;
+            const fraudData = currentData.data.filter(t => t.predicted_fraud === 1);
+            if (fraudData.length === 0) return 0;
+            return Math.max(...fraudData.map(t => parseFloat(t.amount || 0)));
+        }
+
+        function calculateAvgProbability() {
+            if (!currentData.data) return 0;
+            const fraudData = currentData.data.filter(t => t.predicted_fraud === 1);
+            if (fraudData.length === 0) return 0;
+            const totalProb = fraudData.reduce((sum, t) => sum + (t.fraud_probability || 0), 0);
+            return (totalProb / fraudData.length).toFixed(1);
+        }
+
+        function getMetricLabel(metric) {
+            const labels = {
+                'fraud_rate': 'Fraud Rate (%)',
+                'fraud_count': 'Fraud Cases',
+                'avg_amount': 'Average Amount ($)',
+                'total_amount': 'Total Amount ($)'
+            };
+            return labels[metric] || metric;
+        }
+
+        function getMetricProperty(metric) {
+            const properties = {
+                'fraud_rate': 'fraud_rate',
+                'fraud_count': 'fraud_count',
+                'avg_amount': 'max_amount', // Using max_amount as example
+                'total_amount': 'total_count' // Using total_count as example
+            };
+            return properties[metric] || metric;
         }
         
         // Download results
@@ -1137,11 +1662,11 @@ document.addEventListener('DOMContentLoaded', checkAuthStatus);
             }
             
             // Convert data to CSV
-            let csvContent = "Step,Type,Amount,Old Balance,New Balance,Source Account,Destination Account,Status\n";
+            let csvContent = "User ID,Type,Amount,Old Balance,New Balance,Source Account,Destination Account,Branch,Status,Fraud Probability\n";
             
             currentData.data.forEach(t => {
                 const status = t.predicted_fraud === 1 ? "Fraud" : "Legitimate";
-                csvContent += `${t.step || ''},${t.type || ''},${t.amount || ''},${t.oldbalanceOrg || ''},${t.newbalanceOrig || ''},${t.nameOrig || ''},${t.nameDest || ''},${status},${t.fraud_probability || '0'}%\n`;
+                csvContent += `${t.user_id || ''},${t.type || ''},${t.amount || ''},${t.old_balance || ''},${t.new_balance || ''},${t.source_account || ''},${t.destination_account || ''},${t.branch || ''},${status},${t.fraud_probability || '0'}%\n`;
             });
             
             // Create download link

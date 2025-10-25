@@ -20,12 +20,27 @@ USER_DATA_FOLDER = "user_data"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(USER_DATA_FOLDER, exist_ok=True)
 
-required_columns = [
-    'transaction_date', 'type', 'amount',
-    'old_balance', 'new_balance', 'branch',
-    'currency', 'device', 'location'
-]
-
+required_columns = ['user_id',
+ 'transaction_date',
+ 'type',
+ 'amount',
+ 'old_balance',
+ 'new_balance',
+ 'balance_mismatch',
+ 'amount_spike',
+ 'destination_account',
+ 'new_destination',
+ 'blacklisted_dest',
+ 'source_account',
+ 'branch',
+ 'currency',
+ 'device',
+ 'device_change',
+ 'ip',
+ 'ip_unusual',
+ 'location',
+ 'odd_hour',
+ 'velocity']
 # دوال قاعدة البيانات
 def get_db_connection():
     try:
@@ -154,18 +169,34 @@ def prepare_data(df):
     if missing:
         raise ValueError(f"Missing columns: {', '.join(missing)}")
 
-    df["hour"] = pd.to_datetime(df["transaction_date"]).dt.hour
-    df["dayofweek"] = pd.to_datetime(df["transaction_date"]).dt.dayofweek
-    df = df.drop(columns=["transaction_date"], errors="ignore")
+    # df["hour"] = pd.to_datetime(df["transaction_date"]).dt.hour
+    # df["dayofweek"] = pd.to_datetime(df["transaction_date"]).dt.dayofweek
+    # df = df.drop(columns=["transaction_date"], errors="ignore")
 
-    df["balance_diff"] = df["old_balance"] - df["new_balance"]
-    df["amount_ratio"] = df["amount"] / (df["old_balance"] + 1e-6)
+    # df["balance_diff"] = df["old_balance"] - df["new_balance"]
+    # df["amount_ratio"] = df["amount"] / (df["old_balance"] + 1e-6)
 
-    final_columns = [
-        'type', 'amount', 'old_balance', 'new_balance',
-        'branch', 'currency', 'device', 'location',
-        'hour', 'dayofweek' , 'balance_diff', 'amount_ratio'
-    ]
+    final_columns = ['user_id',
+ 'transaction_date',
+ 'type',
+ 'amount',
+ 'old_balance',
+ 'new_balance',
+ 'balance_mismatch',
+ 'amount_spike',
+ 'destination_account',
+ 'new_destination',
+ 'blacklisted_dest',
+ 'source_account',
+ 'branch',
+ 'currency',
+ 'device',
+ 'device_change',
+ 'ip',
+ 'ip_unusual',
+ 'location',
+ 'odd_hour',
+ 'velocity']
 
     print("✅ Final columns for model:", final_columns)
     return df[final_columns]
@@ -314,7 +345,7 @@ def predict_route():
         df_prepared = prepare_data(df.copy())
 
         model = CatBoostClassifier()
-        model.load_model("fraud_catboost_model.cbm")
+        model.load_model("fra_catboost_model.cbm")
         print("🤖 Model loaded successfully.")
 
         model_features = model.feature_names_
